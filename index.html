@@ -6,29 +6,37 @@
 <title>Prueba Biketenance</title>
 <style>
   body { font-family: sans-serif; background:#111; color:#eee; padding:20px; }
+  input { width:100%; box-sizing:border-box; padding:12px; font-size:16px; border-radius:8px; border:1px solid #444; background:#222; color:#eee; margin:4px 0 12px; }
   button { background:#f60; color:#fff; border:0; padding:14px 20px; font-size:18px; border-radius:8px; margin:6px 0; width:100%; }
-  pre { background:#222; padding:12px; border-radius:8px; white-space:pre-wrap; word-break:break-all; }
+  pre { background:#222; padding:12px; border-radius:8px; white-space:pre-wrap; word-break:break-all; max-height:60vh; overflow:auto; }
+  label { font-size:14px; color:#aaa; }
 </style>
 </head>
 <body>
-<h1 style="color:#f60">Prueba Biketenance</h1>
-<button onclick="probar('GET')">Probar GET</button>
-<button onclick="probar('POST')">Probar POST</button>
-<pre id="salida">Pulsa un botón...</pre>
+<h1 style="color:#f60">Prueba de la puerta</h1>
+<label>URL puerta (acaba en /exec)</label>
+<input id="url" type="url" autocomplete="off">
+<label>Clave</label>
+<input id="clave" type="password" autocomplete="off">
+<button onclick="pedir('ping')">1 · Probar clave (ping)</button>
+<button onclick="pedir('cargarGaraje')">2 · Leer mi garaje</button>
+<pre id="salida">Rellena los dos campos y pulsa un botón...</pre>
 
 <script>
-const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbz8JzM2lWziSNRPPX4iI4am8QgdD0Xqbrqz_GABGO_Q9K_kDOUmUSegGebOTTJFQk6CjQ/exec';
-
-async function probar(tipo) {
+async function pedir(funcion) {
   const salida = document.getElementById('salida');
-  salida.textContent = 'Llamando por ' + tipo + '...';
+  const url = document.getElementById('url').value.trim();
+  const clave = document.getElementById('clave').value;
+  if (!url || !clave) { salida.textContent = 'Faltan la URL o la clave.'; return; }
+  salida.textContent = 'Llamando a ' + funcion + '...';
   try {
-    const opciones = tipo === 'POST'
-      ? { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ hola: 'desde GitHub' }) }
-      : { method: 'GET' };
-    const r = await fetch(URL_SCRIPT, opciones);
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ k: clave, f: funcion, a: [] })
+    });
     const datos = await r.json();
-    salida.textContent = '✅ FUNCIONA\n\n' + JSON.stringify(datos, null, 2);
+    salida.textContent = (datos.ok ? '✅ FUNCIONA\n\n' : '❌ RESPUESTA CON ERROR\n\n') + JSON.stringify(datos, null, 2);
   } catch (err) {
     salida.textContent = '❌ FALLO\n\n' + err;
   }
