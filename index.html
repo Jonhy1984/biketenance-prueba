@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prueba Biketenance</title>
+<style>
+  body { font-family: sans-serif; background:#111; color:#eee; padding:20px; }
+  button { background:#f60; color:#fff; border:0; padding:14px 20px; font-size:18px; border-radius:8px; margin:6px 0; width:100%; }
+  pre { background:#222; padding:12px; border-radius:8px; white-space:pre-wrap; word-break:break-all; }
+</style>
+</head>
+<body>
+<h1 style="color:#f60">Prueba Biketenance</h1>
+<button onclick="probar('GET')">Probar GET</button>
+<button onclick="probar('POST')">Probar POST</button>
+<pre id="salida">Pulsa un botón...</pre>
+
+<script>
+const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbz8JzM2lWziSNRPPX4iI4am8QgdD0Xqbrqz_GABGO_Q9K_kDOUmUSegGebOTTJFQk6CjQ/exec';
+
+async function probar(tipo) {
+  const salida = document.getElementById('salida');
+  salida.textContent = 'Llamando por ' + tipo + '...';
+  try {
+    const opciones = tipo === 'POST'
+      ? { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ hola: 'desde GitHub' }) }
+      : { method: 'GET' };
+    const r = await fetch(URL_SCRIPT, opciones);
+    const datos = await r.json();
+    salida.textContent = '✅ FUNCIONA\n\n' + JSON.stringify(datos, null, 2);
+  } catch (err) {
+    salida.textContent = '❌ FALLO\n\n' + err;
+  }
+}
+</script>
+</body>
+</html>
